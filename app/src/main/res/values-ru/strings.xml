@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="login_text_input_hint">Логин</string>
+    <string name="token_text_input_hint">Токен</string>
+    <string name="button_next">Далее</string>
+    <string name="button_back">Назад</string>
+</resources>

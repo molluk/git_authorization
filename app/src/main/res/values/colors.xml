@@ -1,10 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
+
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="element_main">#F1F2ED</color>
+    <color name="element_main_contrast">#333333</color>
+    <color name="element_default">#AE3EC9</color>
+    <color name="element_link">#DA77F2</color>
+    <color name="element_disable">#221725</color>
+
+    <color name="blue">#BDDFFF</color>
+
+    <color name="gray_secondary">#999999</color>
+    <color name="gray_disable">#4E4E4E</color>
+
+    <color name="error_default">#C92A2A</color>
+    <color name="error_disable">#40C92A2A</color>
+
+    <color name="warning_default">#D9480F</color>
+    <color name="warning_disable">#40D9480F</color>
+
+    <color name="background_default">#121212</color>
+    <color name="background_default_contrast">#FAFAFA</color>
+    <color name="background_secondary">#212529</color>
+    <color name="background_secondary_contrast">#F8F9FA</color>
+    <color name="background_tile">#343A40</color>
+    <color name="background_tile_contrast">#ECECEC</color>
+
+    <color name="separator_default">#938F99</color>
+    <color name="separator_default_contrast">#6C757D </color>
 </resources>

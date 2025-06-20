@@ -1,3 +1,8 @@
 <resources>
-    <string name="app_name">git_authorization</string>
+    <string name="app_name" translatable="false">git_authorization</string>
+    <string name="imageview_name" translatable="false">imageView</string>
+    <string name="login_text_input_hint">Login</string>
+    <string name="token_text_input_hint">Token</string>
+    <string name="button_next">Next</string>
+    <string name="button_back">Back</string>
 </resources>

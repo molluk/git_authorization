@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Git_authorization" parent="android:Theme.Material.Light.NoActionBar" />
+<!--    <style name="Theme.Git_authorization.Light" parent="Theme.MaterialComponents.DayNight.NoActionBar" >-->
+<!--        <item name="android:windowBackground">@color/background_default_contrast</item>-->
+<!--    </style>-->
+
+<!--    <style name="Theme.Git_authorization.Dark" parent="Theme.MaterialComponents.DayNight.NoActionBar" >-->
+<!--        <item name="android:windowBackground">@color/background_default</item>-->
+<!--    </style>-->
+
+    <style name="AppTheme" parent="DefaultStyle">
+
+    </style>
+
 </resources>

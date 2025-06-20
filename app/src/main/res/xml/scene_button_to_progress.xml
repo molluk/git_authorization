@@ -1,0 +1,183 @@
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:motion="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        motion:constraintSetEnd="@+id/end_progress_visible"
+        motion:constraintSetStart="@+id/start_button_visible"
+        motion:duration="250">
+
+        <KeyFrameSet>
+            <!-- Анимация исчезновения текста кнопки -->
+            <KeyAttribute
+                android:alpha="0"
+                motion:framePosition="50"
+                motion:motionTarget="@id/next_button" />
+
+            <!-- Анимация исчезновения CardView -->
+            <KeyAttribute
+                android:alpha="0"
+                motion:framePosition="70"
+                motion:motionTarget="@id/button_card_container" />
+
+            <!-- Анимация появления ProgressIndicator -->
+            <KeyAttribute
+                android:alpha="0"
+                motion:framePosition="50"
+                motion:motionTarget="@id/progress_circular" />
+            <KeyAttribute
+                android:alpha="1"
+                motion:framePosition="100"
+                motion:motionTarget="@id/progress_circular" />
+        </KeyFrameSet>
+    </Transition>
+
+    <ConstraintSet android:id="@+id/initial_state_button_hidden">
+        <Constraint
+            android:id="@id/button_card_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="0"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toTopOf="parent">
+            <CustomAttribute
+                motion:attributeName="radius"
+                motion:customDimension="16dp" />
+        </Constraint>
+
+        <Constraint
+            android:id="@id/next_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="0"
+            motion:layout_constraintBottom_toBottomOf="@id/button_card_container"
+            motion:layout_constraintEnd_toEndOf="@id/button_card_container"
+            motion:layout_constraintStart_toStartOf="@id/button_card_container"
+            motion:layout_constraintTop_toTopOf="@id/button_card_container" />
+
+        <Constraint
+            android:id="@id/progress_circular"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:alpha="0"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintDimensionRatio="1:1"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toTopOf="parent" />
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/initial_state_button_visible">
+        <Constraint
+            android:id="@id/button_card_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="1"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toTopOf="parent">
+            <CustomAttribute
+                motion:attributeName="radius"
+                motion:customDimension="16dp" />
+        </Constraint>
+
+        <Constraint
+            android:id="@id/next_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="1"
+            motion:layout_constraintBottom_toBottomOf="@id/button_card_container"
+            motion:layout_constraintEnd_toEndOf="@id/button_card_container"
+            motion:layout_constraintStart_toStartOf="@id/button_card_container"
+            motion:layout_constraintTop_toTopOf="@id/button_card_container" />
+
+        <Constraint
+            android:id="@id/progress_circular"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:alpha="0"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintDimensionRatio="1:1"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toTopOf="parent" />
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/start_button_visible">
+        <Constraint
+            android:id="@id/button_card_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="1"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toTopOf="parent">
+            <CustomAttribute
+                motion:attributeName="radius"
+                motion:customDimension="16dp" />
+        </Constraint>
+
+        <Constraint
+            android:id="@id/next_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="1"
+            motion:layout_constraintBottom_toBottomOf="@id/button_card_container"
+            motion:layout_constraintEnd_toEndOf="@id/button_card_container"
+            motion:layout_constraintStart_toStartOf="@id/button_card_container"
+            motion:layout_constraintTop_toTopOf="@id/button_card_container" />
+
+        <Constraint
+            android:id="@id/progress_circular"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:alpha="0"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintDimensionRatio="1:1"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toTopOf="parent" />
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/end_progress_visible">
+        <Constraint
+            android:id="@id/button_card_container"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:alpha="0"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintDimensionRatio="1:1"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toTopOf="parent">
+            <CustomAttribute
+                motion:attributeName="radius"
+                motion:customDimension="32dp" />
+        </Constraint>
+
+        <Constraint
+            android:id="@id/next_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="0"
+            motion:layout_constraintBottom_toBottomOf="@id/button_card_container"
+            motion:layout_constraintEnd_toEndOf="@id/button_card_container"
+            motion:layout_constraintStart_toStartOf="@id/button_card_container"
+            motion:layout_constraintTop_toTopOf="@id/button_card_container" />
+
+        <Constraint
+            android:id="@id/progress_circular"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:alpha="1"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintDimensionRatio="1:1"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toTopOf="parent" />
+    </ConstraintSet>
+
+</MotionScene>

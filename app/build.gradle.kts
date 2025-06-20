@@ -1,6 +1,8 @@
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.jetbrains.kotlin.android)
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -9,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "ru.molluk.git_authorization"
-        minSdk = 28
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -30,17 +32,15 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
+        freeCompilerArgs = freeCompilerArgs + "-Xjvm-default=all"
     }
     buildFeatures {
-        compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        viewBinding = true
     }
     packaging {
         resources {
@@ -49,21 +49,81 @@ android {
     }
 }
 
-dependencies {
+kotlin {
+    jvmToolchain(17)
+}
 
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
+kapt {
+    correctErrorTypes = true
+}
+
+dependencies {
+    val javapoet = "1.13.0"
+    val coreKtx = "1.13.1"
+    val kotlin = "2.0.0"
+    val junit = "4.13.2"
+    val junitVersion = "1.2.1"
+    val espressoCore = "3.6.1"
+    val lifecycleRuntimeKtx = "2.9.1"
+    val appcompat = "1.6.1"
+    val coroutines = "1.8.0"
+    val metadata = "0.9.0"
+    val lifecycleVersion = "2.9.1"
+    val retrofit = "2.9.0"
+    val okhttp = "4.12.0"
+    val room = "2.6.1"
+    val navVersion = "2.9.0"
+    val material = "1.9.0"
+    val hilt = "2.49"
+    val hiltNavigation = "1.2.0"
+    val constraintlayout = "2.2.1"
+
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin")
+    implementation("com.squareup:javapoet:$javapoet")
+    implementation("androidx.core:core-ktx:$coreKtx")
+    androidTestImplementation("junit:junit:$junit")
+    androidTestImplementation("androidx.test.ext:junit:$junitVersion")
+    implementation("androidx.test.espresso:espresso-core:$espressoCore")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleRuntimeKtx")
+    implementation("androidx.appcompat:appcompat:$appcompat")
+
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlin")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines")
+    implementation("org.jetbrains.kotlinx:kotlinx-metadata-jvm:$metadata")
+
+    // ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycleVersion")
+
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:$retrofit")
+    implementation("com.squareup.retrofit2:converter-gson:$retrofit")
+    implementation("com.squareup.retrofit2:converter-scalars:$retrofit")
+
+    // OkHttp
+    implementation("com.squareup.okhttp3:okhttp:$okhttp")
+    implementation("com.squareup.okhttp3:logging-interceptor:$okhttp")
+
+    // Navigation
+    implementation("androidx.navigation:navigation-fragment:$navVersion")
+    implementation("androidx.navigation:navigation-ui:$navVersion")
+
+    // Material Design
+    implementation("com.google.android.material:material:$material")
+    implementation("androidx.constraintlayout:constraintlayout:$constraintlayout")
+
+    // Hilt
+    implementation("com.google.dagger:hilt-android:$hilt")
+    kapt("com.google.dagger:hilt-android-compiler:$hilt")
+    kapt("androidx.hilt:hilt-compiler:$hiltNavigation")
+
+    // Для работы ViewModel с Hilt
+    implementation("androidx.hilt:hilt-navigation-fragment:$hiltNavigation")
+
+    // Room
+    implementation("androidx.room:room-runtime:$room")
+    kapt("androidx.room:room-compiler:$room")
+    implementation("androidx.room:room-ktx:$room")
 }

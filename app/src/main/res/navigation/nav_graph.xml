@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/splash_screen">
+
+    <fragment
+        android:id="@+id/splash_screen"
+        android:name="ru.molluk.git_authorization.ui.fragments.splash.SplashScreenFragment"
+        tools:layout="@layout/splash_screen_fragment">
+        <action
+            android:id="@+id/action_splash_screen_to_login_screen"
+            app:destination="@id/login_screen"
+            app:popUpTo="@id/splash_screen"
+            app:popUpToInclusive="true"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/login_screen"
+        android:name="ru.molluk.git_authorization.ui.fragments.login.LoginFragment"
+        tools:layout="@layout/login_fragment">
+        <action
+            android:id="@+id/action_login_screen_to_home_screen"
+            app:destination="@id/home_screen"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/home_screen"
+        android:name="ru.molluk.git_authorization.ui.fragments.home.HomeFragment"
+        tools:layout="@layout/home_fragment">
+
+    </fragment>
+
+
+</navigation>

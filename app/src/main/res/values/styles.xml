@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="DefaultStyle" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/white</item>
+        <item name="android:windowBackground">@color/background_default</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+
+        <item name="colorControlNormal">@color/separator_default</item>
+        <item name="colorControlActivated">@color/separator_default</item>
+        <item name="colorOnSurface">@color/white</item>
+    </style>
+
+    <style name="Theme.Git_authorization.Light" parent="DefaultStyle">
+        <item name="android:windowBackground">@color/background_default_contrast</item>
+    </style>
+
+    <style name="Theme.Git_authorization.Dark" parent="DefaultStyle">
+        <item name="android:windowBackground">@color/background_default</item>
+    </style>
+
+    <style name="CustomTextInputLayout.OutlinedBox" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="android:textCursorDrawable">@color/white</item>
+        <item name="boxStrokeColor">@color/box_stroke_selector</item>
+        <item name="boxStrokeWidth">2dp</item>
+        <item name="boxStrokeErrorColor">@color/error_default</item>
+        <item name="android:textColorHint">@color/white</item>
+        <item name="boxStrokeWidthFocused">2dp</item>
+        <item name="endIconTint">@color/white</item>
+        <item name="helperTextEnabled">true</item>
+        <item name="hintTextColor">@color/white</item>
+        <item name="hintEnabled">true</item>
+        <item name="android:enabled">true</item>
+    </style>
+
+    <style name="CustomTextInputEditText" parent="Widget.MaterialComponents.TextInputEditText.OutlinedBox">
+        <item name="maxLines">1</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+</resources>
