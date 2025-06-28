@@ -9,6 +9,7 @@
     <color name="element_default">#AE3EC9</color>
     <color name="element_link">#DA77F2</color>
     <color name="element_disable">#221725</color>
+    <color name="element_active">#56d364</color>
 
     <color name="blue">#BDDFFF</color>
 

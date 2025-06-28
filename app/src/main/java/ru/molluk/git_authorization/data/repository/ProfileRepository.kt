@@ -12,7 +12,7 @@ class ProfileRepository @Inject constructor(
     }
 
     suspend fun setActiveProfile(profile: UserProfile) {
-        profileDao.activateProfile(profile.id)
+        profileDao.setProfileAsActive(profile.id)
     }
 
     suspend fun getProfile(profile: UserProfile): UserProfile? {
@@ -31,5 +31,11 @@ class ProfileRepository @Inject constructor(
         profileDao.deactivateAllProfiles()
     }
 
+    suspend fun deleteProfileById(id: String) {
+        profileDao.deleteProfileById(id)
+    }
 
+    suspend fun deleteProfile(profile: UserProfile) {
+        profileDao.deleteProfile(profile)
+    }
 }

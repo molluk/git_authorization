@@ -14,6 +14,7 @@ import ru.molluk.git_authorization.data.auth.TokenManager
 import ru.molluk.git_authorization.data.remote.api.GitHubApiService
 import ru.molluk.git_authorization.data.remote.api.OctocatApiService
 import ru.molluk.git_authorization.data.remote.network.interceptors.AuthInterceptor
+import ru.molluk.git_authorization.data.remote.network.interceptors.ErrorHandlingInterceptor
 import javax.inject.Singleton
 
 @Module
@@ -24,9 +25,13 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient {
+    fun provideOkHttpClient(
+        authInterceptor: AuthInterceptor,
+        errorInterceptor: ErrorHandlingInterceptor
+    ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
+            .addInterceptor(errorInterceptor)
             .addInterceptor(HttpLoggingInterceptor().apply {
                 level = Level.BODY
             })

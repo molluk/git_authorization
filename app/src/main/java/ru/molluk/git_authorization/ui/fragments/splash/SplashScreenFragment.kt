@@ -61,14 +61,8 @@ class SplashScreenFragment : Fragment() {
                         binding?.progressCircular?.show()
                     }
 
-                    is UiState.Success<String> -> {
-                        binding?.progressCircular?.fadeVisibility(View.GONE, 200, onEnd = {
-                            binding?.let { bind ->
-                                animateViewToBias(bind.gitLogoIv, 0.2f, bind.root, 200) {
-                                    navigateToLoginScreen()
-                                }
-                            }
-                        })
+                    is UiState.Success -> {
+                        viewModel.getUserActive()
                     }
 
                     is UiState.Error -> {
@@ -99,10 +93,30 @@ class SplashScreenFragment : Fragment() {
                 }
             }
         }
-    }
-
-    private fun navigateToLoginScreen() {
-        findNavController().navigate(R.id.action_splash_screen_to_login_screen)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.user.collect { user ->
+                when (user) {
+                    is UiState.Loading -> {
+                        binding?.progressCircular?.show()
+                    }
+                    is UiState.Success -> {
+                        binding?.progressCircular?.fadeVisibility(View.GONE, 200, onEnd = {
+                            val action = SplashScreenFragmentDirections.actionSplashFragmentToHomeFragment(user.data)
+                            findNavController().navigate(action)
+                        })
+                    }
+                    is UiState.Error -> {
+                        binding?.progressCircular?.fadeVisibility(View.GONE, 200, onEnd = {
+                            binding?.let { bind ->
+                                animateViewToBias(bind.gitLogoIv, 0.2f, bind.root, 200) {
+                                    findNavController().navigate(R.id.action_splashFragment_to_loginFragment)
+                                }
+                            }
+                        })
+                    }
+                }
+            }
+        }
     }
 
     private fun animateViewToBias(

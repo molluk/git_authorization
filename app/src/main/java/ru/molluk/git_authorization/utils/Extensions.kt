@@ -1,7 +1,10 @@
 package ru.molluk.git_authorization.utils
 
+import android.content.Context
 import android.util.Patterns
 import android.view.View
+import java.time.Instant
+import java.time.format.DateTimeFormatter
 
 fun View.fadeVisibility(
     targetVisibility: Int,
@@ -36,3 +39,11 @@ fun isValidEmail(email: String?): Boolean {
         Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 }
+
+fun String.formatToDateYMD(): String {
+    val instant = Instant.parse(this)
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    return formatter.format(instant.atZone(java.time.ZoneId.systemDefault()))
+}
+
+fun Int.dpToPx(context: Context): Int = (this * context.resources.displayMetrics.density).toInt()

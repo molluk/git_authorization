@@ -1,32 +1,40 @@
 package ru.molluk.git_authorization.ui.fragments.splash
 
+import android.app.Application
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import ru.molluk.git_authorization.R
+import ru.molluk.git_authorization.data.local.entity.UserProfile
 import ru.molluk.git_authorization.data.repository.OctocatRepositoryImpl
+import ru.molluk.git_authorization.data.repository.ProfileRepository
+import ru.molluk.git_authorization.utils.DefaultViewModel
+import ru.molluk.git_authorization.utils.DomainException
 import ru.molluk.git_authorization.utils.NetworkMonitor
 import ru.molluk.git_authorization.utils.UiState
-import java.io.IOException
-import java.net.UnknownHostException
 import javax.inject.Inject
 
 @HiltViewModel
 class SplashScreenViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
+    private val application: Application,
     private val octocatRepository: OctocatRepositoryImpl,
-    private val networkMonitor: NetworkMonitor
-) : ViewModel() {
+    private val networkMonitor: NetworkMonitor,
+    private val profileRepository: ProfileRepository
+) : DefaultViewModel() {
 
     private val _isNetworkAvailable = MutableStateFlow(networkMonitor.hasInternetConnection())
     val isNetworkAvailable = _isNetworkAvailable.asSharedFlow()
 
     private val _octocat = MutableSharedFlow<UiState<String>>(1)
     val octocat = _octocat.asSharedFlow()
+
+    private val _user = MutableSharedFlow<UiState<UserProfile>>()
+    val user = _user.asSharedFlow()
 
     init {
         viewModelScope.launch {
@@ -39,10 +47,31 @@ class SplashScreenViewModel @Inject constructor(
         }
     }
 
+    fun getUserActive() {
+        viewModelScope.launch {
+            _user.emit(UiState.Loading)
+            try {
+                val response = profileRepository.getActiveProfile()
+                _user.emit(
+                    if (response != null) {
+                        UiState.Success(response)
+                    } else {
+                        UiState.Error(application.getString(R.string.users_no_active))
+                    }
+                )
+            } catch (e: DomainException) {
+                val errorMessage = parseDomainException(e)
+                _user.emit(UiState.Error(errorMessage, e))
+            } catch (e: Exception) {
+
+            }
+        }
+    }
+
     fun fetchOctocat() {
         viewModelScope.launch {
             if (!networkMonitor.hasInternetConnection()) {
-                _octocat.emit(UiState.Error("Нет подключения к интернету"))
+                _octocat.emit(UiState.Error(application.getString(R.string.network_error_no_connection)))
                 return@launch
             }
 
@@ -50,13 +79,13 @@ class SplashScreenViewModel @Inject constructor(
             try {
                 val response = octocatRepository.getOctocat()
                 _octocat.emit(UiState.Success(response))
-            } catch (e: Exception) {
-                val errorMessage = if (e is UnknownHostException || e is IOException) {
-                    "Ошибка сети. Не удалось загрузить данные"
-                } else {
-                    "Не удалось загрузить данные. Попробуйте позже"
-                }
+            }
+            catch (e: DomainException) {
+                val errorMessage = parseDomainException(e)
                 _octocat.emit(UiState.Error(errorMessage, e))
+            }
+            catch (e: Exception) {
+                _octocat.emit(UiState.Error(DomainException.Unknown(cause = e).message ?: application.getString(R.string.error_unknown), e))
             }
         }
     }
