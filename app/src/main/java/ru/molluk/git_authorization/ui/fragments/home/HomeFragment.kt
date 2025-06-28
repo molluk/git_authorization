@@ -45,12 +45,15 @@ class HomeFragment : Fragment() {
 
     private val viewModel: HomeViewModel by viewModels()
 
+    val userBottomShield = UserShieldFragment()
+
     private lateinit var userProfile: UserProfile
     private lateinit var userResponse: UserResponse
 
     private var currentPage = 1
     private var isLastPage = false
     private var isLoadingData = false
+    private var isUserDeleted = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -101,7 +104,6 @@ class HomeFragment : Fragment() {
                     selectedProfile?.let {
                         currentPage = 1
                         this.userProfile = it
-                        (binding?.reposRv?.adapter as? GitReposAdapter)?.clearData()
                         viewModel.getUserResponse(userProfile = it, changeUser = true)
                     }
                 }
@@ -113,7 +115,10 @@ class HomeFragment : Fragment() {
                         } else {
                             bundle.getParcelable(DELETED_USER_PROFILE_KEY)
                         }
-                    userDeleted?.let { viewModel.deleteUser(it) }
+                    userDeleted?.let {
+                        isUserDeleted = true
+                        viewModel.deleteUser(it)
+                    }
                 }
             }
         }
@@ -121,7 +126,6 @@ class HomeFragment : Fragment() {
 
     private fun initClickers() {
         binding?.toolbar?.setOnClickListener {
-            val userBottomShield = UserShieldFragment()
             userBottomShield.show(childFragmentManager, userBottomShield.javaClass.simpleName)
         }
 
@@ -212,6 +216,7 @@ class HomeFragment : Fragment() {
                 when (user) {
                     is UiState.Loading -> {
                         binding?.progressCircular?.show()
+                        (binding?.reposRv?.adapter as GitReposAdapter).clearData()
                     }
 
                     is UiState.Success -> {
@@ -307,11 +312,16 @@ class HomeFragment : Fragment() {
                     }
 
                     is UiState.Success -> {
-                        if (users.data.size > 1) {
-                            binding?.profileCountCw?.fadeVisibility(View.VISIBLE)
+                        if (users.data.isNotEmpty()) {
+                            binding?.profileCountCw?.fadeVisibility(if (users.data.size > 1) View.VISIBLE else View.GONE)
                             binding?.profileCountText?.text = (users.data.size).toString()
-                        } else if (users.data.size == 1) {
-                            binding?.profileCountCw?.fadeVisibility(View.GONE)
+                            if (isUserDeleted) {
+                                val nextUser = users.data.first { it.id != userResponse.id.toString() }
+                                userProfile = nextUser
+                                viewModel.saveUser(nextUser)
+                                viewModel.getUserResponse(nextUser)
+                            }
+                            isUserDeleted = false
                         } else {
                             val action =
                                 HomeFragmentDirections.actionHomeFragmentLogoutToLoginFragment(false)
@@ -325,6 +335,10 @@ class HomeFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
     }
 
     override fun onDestroy() {

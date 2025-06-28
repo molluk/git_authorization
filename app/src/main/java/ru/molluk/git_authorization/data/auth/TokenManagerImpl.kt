@@ -75,13 +75,10 @@ class TokenManagerImpl @Inject constructor(
         val activeId = appStatePrefs.getString(KEY_CURRENT_PROFILE_ID, null) ?: return null
         val activeProfile = profileDao.getProfile(activeId) ?: return null
         val encryptedTokenBase64 = activeProfile.accessToken ?: return null
-
-        Log.d(this.javaClass.simpleName, "Получаем активный токен $encryptedTokenBase64")
         return getDecryptedToken(encryptedTokenBase64)
     }
 
     override fun getEncryptedToken(token: String?): String {
-        Log.d(this.javaClass.simpleName, "Шифруем токен $token")
         if (token.isNullOrEmpty()) return ""
         return try {
             val encryptedBytes = crypto.encrypt(token.toByteArray(StandardCharsets.UTF_8), null)
@@ -93,7 +90,6 @@ class TokenManagerImpl @Inject constructor(
     }
 
     override fun getDecryptedToken(token: String?): String? {
-        Log.d(this.javaClass.simpleName, "Дешифровываем токен $token")
         if (token.isNullOrEmpty()) {
             Log.w(this.javaClass.simpleName, "Попытка дешифровать пустой или null токен.")
             return null
@@ -103,13 +99,6 @@ class TokenManagerImpl @Inject constructor(
             val encryptedBytesFromBase64 = Base64.decode(token, Base64.DEFAULT)
             val decryptedBytes = crypto.decrypt(encryptedBytesFromBase64, null)
             val decryptedString = String(decryptedBytes, StandardCharsets.UTF_8)
-            Log.d(this.javaClass.simpleName, "Дешифрованный токен: $decryptedString")
-            Log.d(
-                this.javaClass.simpleName,
-                "Дешифрованный почищенный токен: ${
-                    decryptedString.trim().replace("\n", "").replace("\r", "")
-                }"
-            )
             decryptedString.trim().replace("\n", "").replace("\r", "")
         } catch (e: GeneralSecurityException) {
             Log.e(
@@ -126,7 +115,7 @@ class TokenManagerImpl @Inject constructor(
             )
             null
         } catch (e: Exception) {
-            Log.e(this.javaClass.simpleName, "Общая ошибка при дешифровке токена.", e)
+            Log.e(this.javaClass.simpleName, "Ошибка при дешифровке токена.", e)
             null
         }
     }

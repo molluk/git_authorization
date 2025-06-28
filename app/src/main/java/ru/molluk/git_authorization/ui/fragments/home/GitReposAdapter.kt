@@ -44,6 +44,7 @@ class GitReposAdapter() :
     fun clearData() {
         submitList(emptyList())
         isLoading = false
+        notifyDataSetChanged()
     }
 
     fun setLoading(isLoading: Boolean) {
