@@ -51,7 +51,7 @@ class UsersReposAdapter() : RecyclerView.Adapter<UsersReposViewHolder>() {
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: UserProfile, position: Int) {
-            binding.profileLogin.text = "${position + 1}) ${item.login}"
+            binding.profileLogin.text = item.login
             binding.profileId.text = item.id
             binding.profileCreatedDate.text = item.createdAt.formatToDateYMD()
             Glide.with(binding.profileAvatar.context).load(item.avatarUrl)

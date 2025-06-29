@@ -25,58 +25,41 @@
             android:layout_weight="0.9"
             android:orientation="vertical">
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/repos_name"
+            <View
+                android:id="@+id/shimmer_name"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                tools:text="git_authorization" />
+                android:layout_height="20sp"
+                android:background="@color/shimmer_placeholder" />
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/repos_id"
+                android:id="@+id/shimmer_id"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="1"
+                android:layout_height="16sp"
                 android:layout_marginTop="2dp"
-                android:textColor="@color/separator_default"
-                android:textSize="12sp"
-                tools:text="id: 1001443438" />
+                android:background="@color/shimmer_placeholder" />
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/repos_visibility"
+                android:id="@+id/shimmer_visibility"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
+                android:layout_height="16sp"
                 android:layout_marginTop="2dp"
-                android:maxLines="1"
-                android:textColor="@color/separator_default"
-                android:textSize="12sp"
-                tools:text="visibility: private" />
+                android:background="@color/shimmer_placeholder" />
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/repos_link"
+                android:id="@+id/shimmer_link"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="1"
+                android:layout_height="16sp"
                 android:layout_marginTop="2dp"
-                android:textColor="@color/element_link"
-                android:textSize="12sp"
-                tools:text="https://github.com/molluk/git_authorization" />
+                android:background="@color/shimmer_placeholder" />
 
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/repos_button"
-            android:layout_width="wrap_content"
+        <View
+            android:id="@+id/shimmer_button"
+            android:layout_width="24dp"
             android:layout_height="match_parent"
             android:layout_weight="0.05"
-            android:src="@drawable/arrow_forward"
-            app:tint="@color/white" />
+            android:background="@color/shimmer_placeholder" />
 
     </LinearLayout>
 

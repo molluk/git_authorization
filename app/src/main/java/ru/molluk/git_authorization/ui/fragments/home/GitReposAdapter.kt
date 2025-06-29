@@ -61,7 +61,7 @@ class GitReposAdapter() :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: ReposResponse, position: Int) {
-            binding.reposName.text = "${position + 1}) ${item.name}"
+            binding.reposName.text = item.name
             binding.reposId.text = item.id.toString()
             binding.reposVisibility.text = item.visibility
             binding.reposLink.text = item.htmlUrl

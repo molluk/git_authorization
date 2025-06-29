@@ -45,8 +45,6 @@ class HomeFragment : Fragment() {
 
     private val viewModel: HomeViewModel by viewModels()
 
-    val userBottomShield = UserShieldFragment()
-
     private lateinit var userProfile: UserProfile
     private lateinit var userResponse: UserResponse
 
@@ -82,6 +80,10 @@ class HomeFragment : Fragment() {
             viewModel.getUserResponse(it)
         }
         binding?.reposRv?.adapter = GitReposAdapter()
+
+        binding?.refreshLayout?.setOnRefreshListener {
+            viewModel.getUserResponse(userProfile)
+        }
 
         childFragmentManager.setFragmentResultListener(
             REQUEST_USER_KEY,
@@ -126,7 +128,8 @@ class HomeFragment : Fragment() {
 
     private fun initClickers() {
         binding?.toolbar?.setOnClickListener {
-            userBottomShield.show(childFragmentManager, userBottomShield.javaClass.simpleName)
+            val userShieldFragment = UserShieldFragment()
+            userShieldFragment.show(childFragmentManager, userShieldFragment.javaClass.simpleName)
         }
 
         (binding?.reposRv?.adapter as GitReposAdapter).apply {
@@ -181,46 +184,22 @@ class HomeFragment : Fragment() {
 
     private fun setObserveListener() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.userProfile.collect { user ->
-                when (user) {
-                    is UiState.Loading -> {
-                        binding?.progressCircular?.show()
-                    }
-
-                    is UiState.Success -> {
-                        userProfile = user.data
-                        viewModel.getUserResponse(userProfile)
-                    }
-
-                    is UiState.Error -> {
-                        Log.e(
-                            this.javaClass.simpleName,
-                            "${
-                                requireContext().getString(
-                                    R.string.user_error_removed,
-                                    user.message
-                                )
-                            }, ${user.throwable}"
-                        )
-                        Toast.makeText(
-                            requireContext(),
-                            requireContext().getString(R.string.user_error_removed, user.message),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
-            }
-        }
-        viewLifecycleOwner.lifecycleScope.launch {
             viewModel.user.collect { user ->
                 when (user) {
                     is UiState.Loading -> {
-                        binding?.progressCircular?.show()
+                        binding?.shimmerToolbar?.visibility = View.VISIBLE
+                        binding?.shimmerToolbar?.startShimmer()
+                        binding?.profileCl?.visibility = View.GONE
+                        binding?.shimmerRepos?.visibility = View.VISIBLE
+                        binding?.shimmerRepos?.startShimmer()
+                        binding?.reposRv?.visibility = View.GONE
                         (binding?.reposRv?.adapter as GitReposAdapter).clearData()
                     }
 
                     is UiState.Success -> {
-                        binding?.progressCircular?.hide()
+                        binding?.shimmerToolbar?.stopShimmer()
+                        binding?.shimmerToolbar?.visibility = View.GONE
+                        binding?.profileCl?.visibility = View.VISIBLE
                         userResponse = user.data
                         binding?.profileLogin?.text = userResponse.login
                         binding?.profileId?.text =
@@ -248,7 +227,6 @@ class HomeFragment : Fragment() {
                     }
 
                     is UiState.Error -> {
-                        binding?.progressCircular?.hide()
                         Log.e(
                             this.javaClass.simpleName,
                             "${user.message}, ${user.throwable}: stackTrace: "
@@ -273,6 +251,9 @@ class HomeFragment : Fragment() {
                     }
 
                     is UiState.Success -> {
+                        binding?.shimmerRepos?.hideShimmer()
+                        binding?.shimmerRepos?.visibility = View.GONE
+                        binding?.reposRv?.visibility = View.VISIBLE
                         binding?.progressRv?.hide()
                         val data = repos.data
                         if (data.isNotEmpty()) {
@@ -281,11 +262,13 @@ class HomeFragment : Fragment() {
                             isLastPage = true
                         }
                         (binding?.reposRv?.adapter as GitReposAdapter).setLoading(false)
+                        binding?.refreshLayout?.isRefreshing = false
                     }
 
                     is UiState.Error -> {
                         (binding?.reposRv?.adapter as GitReposAdapter).setLoading(false)
                         binding?.progressRv?.hide()
+                        binding?.refreshLayout?.isRefreshing = false
                         Log.e(
                             this.javaClass.simpleName,
                             "${
@@ -316,7 +299,8 @@ class HomeFragment : Fragment() {
                             binding?.profileCountCw?.fadeVisibility(if (users.data.size > 1) View.VISIBLE else View.GONE)
                             binding?.profileCountText?.text = (users.data.size).toString()
                             if (isUserDeleted) {
-                                val nextUser = users.data.first { it.id != userResponse.id.toString() }
+                                val nextUser =
+                                    users.data.first { it.id != userResponse.id.toString() }
                                 userProfile = nextUser
                                 viewModel.saveUser(nextUser)
                                 viewModel.getUserResponse(nextUser)

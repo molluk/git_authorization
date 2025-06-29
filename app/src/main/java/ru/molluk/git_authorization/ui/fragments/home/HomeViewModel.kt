@@ -28,9 +28,6 @@ class HomeViewModel @Inject constructor(
     private val tokenManager: TokenManager
 ) : DefaultViewModel() {
 
-    private val _userSaveProfile = MutableSharedFlow<UiState<UserProfile>>()
-    val userProfile = _userSaveProfile.asSharedFlow()
-
     private val _user = MutableSharedFlow<UiState<UserResponse>>()
     val user = _user.asSharedFlow()
 
@@ -46,28 +43,6 @@ class HomeViewModel @Inject constructor(
             profileRepository.deactivateAllProfiles()
             profileRepository.saveProfile(profile)
             profileRepository.setActiveProfile(profile)
-        }
-    }
-
-    fun getUserActive() {
-        viewModelScope.launch {
-            _userSaveProfile.emit(UiState.Loading)
-
-            try {
-                val response = profileRepository.getActiveProfile()
-                _userSaveProfile.emit(
-                    if (response != null) {
-                        UiState.Success(response)
-                    } else {
-                        UiState.Error(application.getString(R.string.user_error_save_loading))
-                    }
-                )
-            } catch (e: DomainException) {
-                val errorMessage = parseDomainException(e)
-                _userSaveProfile.emit(UiState.Error(errorMessage, e))
-            } catch (e: Exception) {
-
-            }
         }
     }
 
@@ -155,16 +130,14 @@ class HomeViewModel @Inject constructor(
                 val updatedProfiles = profileRepository.getAllProfiles()
 
                 if (updatedProfiles.isNotEmpty()) {
-                    var nextActiveProfile: UserProfile? = if (indexOfDeleted != -1 && updatedProfiles.isNotEmpty()) {
+                    var nextActiveProfile: UserProfile? = if (indexOfDeleted != -1) {
                         if (indexOfDeleted < updatedProfiles.size) {
                             updatedProfiles[indexOfDeleted]
                         } else {
                             updatedProfiles.last()
                         }
-                    } else if (updatedProfiles.isNotEmpty()) {
-                        updatedProfiles.first()
                     } else {
-                        null
+                        updatedProfiles.first()
                     }
 
                     if (nextActiveProfile != null) {

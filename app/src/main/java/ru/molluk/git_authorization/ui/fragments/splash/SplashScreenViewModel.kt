@@ -63,7 +63,7 @@ class SplashScreenViewModel @Inject constructor(
                 val errorMessage = parseDomainException(e)
                 _user.emit(UiState.Error(errorMessage, e))
             } catch (e: Exception) {
-
+                e.printStackTrace()
             }
         }
     }

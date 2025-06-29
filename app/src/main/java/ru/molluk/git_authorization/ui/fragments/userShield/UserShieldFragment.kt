@@ -1,6 +1,7 @@
 package ru.molluk.git_authorization.ui.fragments.userShield
 
 import android.app.Dialog
+import android.content.DialogInterface
 import android.graphics.Canvas
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -29,6 +30,14 @@ class UserShieldFragment : BottomSheetDialogFragment() {
 
     private var binding: UserShieldFragmentBinding? = null
     private val viewModel: UsersShieldViewModel by viewModels()
+    private var isFirstCreation = true
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (savedInstanceState != null) {
+            isFirstCreation = false
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,6 +50,12 @@ class UserShieldFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        if (!isFirstCreation) {
+            dismissAllowingStateLoss()
+            return
+        }
+
         initViews()
         initClickListener()
         setObserveListener()
@@ -223,7 +238,13 @@ class UserShieldFragment : BottomSheetDialogFragment() {
 
                     val itemCount = binding?.recyclerView?.adapter?.itemCount ?: 0
                     when {
-                        itemCount == 0 || itemCount == 1 || itemCount in 2..5 -> {
+                        itemCount == 0 -> {
+                            halfExpandedRatio = 0.1f
+                        }
+                        itemCount == 1 -> {
+                            halfExpandedRatio = 0.15f
+                        }
+                        itemCount in 2..5 -> {
                             halfExpandedRatio = itemCount * 0.1f
                         }
                         else -> {
@@ -245,6 +266,11 @@ class UserShieldFragment : BottomSheetDialogFragment() {
             }
         }
         return dialog
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        isFirstCreation = true
     }
 
     override fun onDestroyView() {

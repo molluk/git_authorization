@@ -31,4 +31,6 @@
 
     <color name="separator_default">#938F99</color>
     <color name="separator_default_contrast">#6C757D </color>
+
+    <color name="shimmer_placeholder">#404040</color>
 </resources>

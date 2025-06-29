@@ -95,6 +95,8 @@ dependencies {
     val glide = "4.16.0"
     val encryption = "1.18.0"
     val crypto = "1.1.0-beta01"
+    val shimmer = "0.5.0"
+    val swiperefreshlayout = "1.1.0"
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin")
@@ -131,6 +133,12 @@ dependencies {
     // Material Design
     implementation("com.google.android.material:material:$material")
     implementation("androidx.constraintlayout:constraintlayout:$constraintlayout")
+
+    // Shimmer
+    implementation("com.facebook.shimmer:shimmer:$shimmer")
+
+    // Swiperefreshlayout
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:$swiperefreshlayout")
 
     // Hilt
     implementation("com.google.dagger:hilt-android:$hilt")
