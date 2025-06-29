@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/parent_cv"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="6dp"
+    app:cardBackgroundColor="@color/background_secondary"
+    app:cardCornerRadius="16dp"
+    app:contentPaddingBottom="8dp"
+    app:contentPaddingLeft="12dp"
+    app:contentPaddingRight="12dp"
+    app:contentPaddingTop="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="0.9"
+            android:orientation="vertical">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/repos_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                tools:text="git_authorization" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/repos_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:layout_marginTop="2dp"
+                android:textColor="@color/separator_default"
+                android:textSize="12sp"
+                tools:text="id: 1001443438" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/repos_visibility"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:layout_marginTop="2dp"
+                android:maxLines="1"
+                android:textColor="@color/separator_default"
+                android:textSize="12sp"
+                tools:text="visibility: private" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/repos_link"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:layout_marginTop="2dp"
+                android:textColor="@color/element_link"
+                android:textSize="12sp"
+                tools:text="https://github.com/molluk/git_authorization" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/repos_button"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="0.05"
+            android:src="@drawable/arrow_forward"
+            app:tint="@color/white" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

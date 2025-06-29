@@ -42,7 +42,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideTokenManager(context: Context, profileDao: ProfileDao): TokenManager {
+    fun provideTokenManager(@ApplicationContext context: Context, profileDao: ProfileDao): TokenManager {
         return TokenManagerImpl(context, profileDao)
     }
 

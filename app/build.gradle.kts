@@ -3,6 +3,8 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
+    id("kotlin-parcelize")
+    id("androidx.navigation.safeargs.kotlin")
 }
 
 android {
@@ -20,8 +22,21 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += mapOf(
+                    "room.schemaLocation" to "$projectDir/schemas".toString()
+                )
+            }
+        }
     }
 
+    applicationVariants.all {
+        outputs.all {
+            val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+            output.outputFileName = "git_auth.apk"
+        }
+    }
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -77,6 +92,11 @@ dependencies {
     val hilt = "2.49"
     val hiltNavigation = "1.2.0"
     val constraintlayout = "2.2.1"
+    val glide = "4.16.0"
+    val encryption = "1.18.0"
+    val crypto = "1.1.0-beta01"
+    val shimmer = "0.5.0"
+    val swiperefreshlayout = "1.1.0"
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin")
@@ -107,12 +127,18 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:$okhttp")
 
     // Navigation
-    implementation("androidx.navigation:navigation-fragment:$navVersion")
-    implementation("androidx.navigation:navigation-ui:$navVersion")
+    implementation("androidx.navigation:navigation-fragment-ktx:$navVersion")
+    implementation("androidx.navigation:navigation-ui-ktx:$navVersion")
 
     // Material Design
     implementation("com.google.android.material:material:$material")
     implementation("androidx.constraintlayout:constraintlayout:$constraintlayout")
+
+    // Shimmer
+    implementation("com.facebook.shimmer:shimmer:$shimmer")
+
+    // Swiperefreshlayout
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:$swiperefreshlayout")
 
     // Hilt
     implementation("com.google.dagger:hilt-android:$hilt")
@@ -126,4 +152,13 @@ dependencies {
     implementation("androidx.room:room-runtime:$room")
     kapt("androidx.room:room-compiler:$room")
     implementation("androidx.room:room-ktx:$room")
+
+    //Glide
+    implementation("com.github.bumptech.glide:glide:$glide")
+
+    //Encryption
+    implementation("com.google.crypto.tink:tink-android:$encryption")
+
+    //Crypto
+    implementation("androidx.security:security-crypto:$crypto")
 }

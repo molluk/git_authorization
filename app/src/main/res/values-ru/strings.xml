@@ -4,4 +4,51 @@
     <string name="token_text_input_hint">Токен</string>
     <string name="button_next">Далее</string>
     <string name="button_back">Назад</string>
+    <string name="token_not_specified">токен не указан</string>
+    <string name="token_specified">токен указан</string>
+    <string name="user_removed">Удален %s</string>
+    <string name="user_error_removed">Не удалось удалить пользователя %s</string>
+    <string name="user_error_save_loading">Ошибка при загрузке сохраненного пользователя: %s</string>
+    <string name="repos_error_loading">Ошибка при загрузке репозиториев: %s</string>
+    <string name="repos_link_copy">Ссылка на репозиторий %s скопирована</string>
+    <string name="app_not_found">Не найдено приложение для открытия ссылки</string>
+    <string name="url_error_open">Не удалось открыть ссылку: %s</string>
+    <string name="login_filling_error">Логин или токен не должен быть пуст</string>
+    <string name="user_error_download">Не удалось загрузить пользователя %1$s, %2$s</string>
+    <string name="repos_error_loading_user">Не удалось загрузить репозиторий для пользователя %1$s, %2$s</string>
+    <string name="network_error_no_connection">Нет подключения к интернету</string>
+    <string name="error_unknown">Неизвестная ошибка</string>
+    <string name="users_no_active">Нет активных пользователей</string>
+    <string name="user_error_single_removed">Нельзя удалить единственного пользователя: %s</string>
+
+        <!-- DomainException Messages -->
+        <string name="error_no_internet">Нет подключения к интернету. Проверьте соединение.</string>
+        <string name="error_no_internet_host">Не удалось подключиться к серверу. Проверьте интернет-соединение.</string>
+        <string name="error_unauthorized_default">Ошибка авторизации. Пожалуйста, войдите снова.</string>
+        <string name="error_unauthorized_token_invalid">Пользователь не авторизован или токен недействителен.</string>
+        <string name="error_forbidden_default">Доступ запрещен.</string>
+        <string name="error_api_rate_limit_exceeded_default">Превышен лимит запросов к API.</string>
+        <string name="error_api_rate_limit_exceeded_retry">Превышен лимит запросов к API. Попробуйте через %1$d сек.</string>
+        <string name="error_not_found_default">Запрошенный ресурс не найден.</string>
+        <string name="error_not_found_specific">Ресурс \'%1$s\' не найден.</string>
+        <string name="error_server_default">Ошибка на сервере. Пожалуйста, попробуйте позже.</string>
+        <string name="error_server_with_code">Ошибка на сервере (код: %1$d). Пожалуйста, попробуйте позже.</string>
+        <string name="error_generic_network">Произошла сетевая ошибка. Пожалуйста, попробуйте позже.</string>
+        <string name="error_generic_network_io">Произошла ошибка сети.</string>
+        <string name="error_generic_network_timeout">Таймаут соединения. Пожалуйста, попробуйте позже.</string>
+        <string name="error_unknown_default">Произошла неизвестная ошибка.</string>
+        <string name="error_unknown_unexpected">Произошла непредвиденная ошибка.</string>
+        <string name="error_unknown_http">Необработанная HTTP ошибка: %1$d</string>
+
+        <string name="error_login_or_token_empty">Логин или токен не могут быть пустыми.</string>
+        <string name="error_load_user_formatted">Не удалось загрузить пользователя %1$s, %2$s</string>
+
+        <string name="fallback_error_no_internet">Проверьте ваше интернет-соединение.</string>
+        <string name="fallback_error_unauthorized">Ошибка авторизации.</string>
+        <string name="fallback_error_forbidden">Доступ запрещен.</string>
+        <string name="fallback_error_api_rate_limit">Превышен лимит запросов.</string>
+        <string name="fallback_error_not_found">Не найдено.</string>
+        <string name="fallback_error_server">Ошибка сервера.</string>
+        <string name="fallback_error_generic_network">Сетевая ошибка.</string>
+        <string name="fallback_error_unknown">Неизвестная ошибка.</string>
 </resources>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/parent_cv"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardBackgroundColor="@color/background_secondary"
+    app:cardCornerRadius="16dp"
+    app:contentPaddingBottom="8dp"
+    app:contentPaddingLeft="12dp"
+    app:contentPaddingRight="12dp"
+    app:contentPaddingTop="8dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <View
+            android:id="@+id/shimmer_login"
+            android:layout_width="0dp"
+            android:layout_height="16sp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="8dp"
+            android:background="@color/shimmer_placeholder"
+            app:layout_constraintEnd_toStartOf="@id/shimmer_avatar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:id="@+id/shimmer_id"
+            android:layout_width="0dp"
+            android:layout_height="12sp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="8dp"
+            android:background="@color/shimmer_placeholder"
+            app:layout_constraintBottom_toTopOf="@id/shimmer_token"
+            app:layout_constraintEnd_toStartOf="@id/shimmer_avatar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/shimmer_login"
+            app:layout_constraintVertical_bias="0" />
+
+        <View
+            android:id="@+id/shimmer_created_date"
+            android:layout_width="0dp"
+            android:layout_height="12sp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="6dp"
+            android:background="@color/shimmer_placeholder"
+            app:layout_constraintBottom_toTopOf="@id/shimmer_token"
+            app:layout_constraintEnd_toStartOf="@id/shimmer_avatar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/shimmer_id" />
+
+        <View
+            android:id="@+id/shimmer_token"
+            android:layout_width="0dp"
+            android:layout_height="12sp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="8dp"
+            android:background="@color/shimmer_placeholder"
+            app:layout_constraintEnd_toStartOf="@id/shimmer_avatar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/shimmer_created_date" />
+
+        <View
+            android:id="@+id/shimmer_avatar"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginVertical="4dp"
+            android:layout_weight="1"
+            android:background="@drawable/shimmer_avatar_placeholder"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

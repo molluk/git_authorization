@@ -1,6 +1,245 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".ui.fragments.home.HomeFragment">
 
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        style="@style/MyCustomToolbarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/background_secondary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/shimmer_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:visibility="gone">
+
+                <include layout="@layout/shimmer_toolbar_user" />
+
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/profile_cl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/profile_login"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginEnd="8dp"
+                    android:ellipsize="end"
+                    android:gravity="start"
+                    android:maxLines="1"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toStartOf="@id/profile_avatar"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="molluk_151515151" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/profile_id"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginEnd="8dp"
+                    android:ellipsize="end"
+                    android:gravity="start"
+                    android:maxLines="1"
+                    android:textColor="@color/separator_default"
+                    android:textSize="12sp"
+                    app:layout_constraintBottom_toTopOf="@id/profile_created_date"
+                    app:layout_constraintEnd_toStartOf="@id/profile_avatar"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/profile_login"
+                    tools:text="id: 635805312131551" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/profile_created_date"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="6dp"
+                    android:ellipsize="end"
+                    android:gravity="start"
+                    android:maxLines="1"
+                    android:textColor="@color/separator_default"
+                    android:textSize="12sp"
+                    app:layout_constraintBottom_toTopOf="@id/profile_token"
+                    app:layout_constraintEnd_toStartOf="@id/profile_avatar"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/profile_id"
+                    tools:text="2020-04-13T07:44:06Z" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/profile_token"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginEnd="8dp"
+                    android:ellipsize="end"
+                    android:gravity="start"
+                    android:maxLines="1"
+                    android:textColor="@color/error_default"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toStartOf="@id/profile_avatar"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/profile_created_date"
+                    tools:text="token not specified" />
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/profile_avatar"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginVertical="4dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="12dp"
+                    android:layout_weight="1"
+                    android:background="@color/background_secondary"
+                    android:scaleType="centerInside"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_goneMarginEnd="10dp"
+                    app:shapeAppearanceOverlay="@style/circleImageView"
+                    app:strokeColor="@color/separator_default"
+                    app:strokeWidth="1dp"
+                    tools:src="@drawable/ic_launcher_foreground" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/profile_count_cw"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:background="@color/background_secondary"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="@color/black"
+                    app:cardCornerRadius="50dp"
+                    app:cardElevation="1dp"
+                    app:contentPaddingBottom="2dp"
+                    app:contentPaddingLeft="6dp"
+                    app:contentPaddingRight="6dp"
+                    app:contentPaddingTop="2dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:strokeColor="@color/separator_default"
+                    app:strokeWidth="1dp"
+                    tools:visibility="visible">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/profile_count_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="start"
+                        android:maxLines="1"
+                        android:textColor="@color/white"
+                        android:textSize="12sp"
+                        tools:text="6" />
+
+                </com.google.android.material.card.MaterialCardView>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="4dp"
+                android:background="@color/white" />
+        </LinearLayout>
+    </com.google.android.material.appbar.MaterialToolbar>
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/refreshLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/shimmer_repos"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="12dp"
+                android:layout_marginTop="6dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/toolbar"
+                tools:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <include layout="@layout/shimmer_adapter_repos" />
+
+                    <include layout="@layout/shimmer_adapter_repos" />
+
+                    <include layout="@layout/shimmer_adapter_repos" />
+
+                </LinearLayout>
+
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/repos_rv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="6dp"
+                android:clipToPadding="false"
+                android:paddingHorizontal="12dp"
+                android:visibility="gone"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/toolbar"
+                tools:itemCount="10"
+                tools:listitem="@layout/adapter_repos_item"
+                tools:visibility="visible" />
+        </FrameLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/progress_rv"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginTop="16dp"
+        android:indeterminate="true"
+        app:indicatorColor="@color/element_default"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:trackColor="@color/gray_secondary"
+        app:trackThickness="4dp"
+        tools:progress="50"
+        tools:secondaryProgress="100" />
 </androidx.constraintlayout.widget.ConstraintLayout>

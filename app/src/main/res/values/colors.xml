@@ -9,6 +9,7 @@
     <color name="element_default">#AE3EC9</color>
     <color name="element_link">#DA77F2</color>
     <color name="element_disable">#221725</color>
+    <color name="element_active">#56d364</color>
 
     <color name="blue">#BDDFFF</color>
 
@@ -30,4 +31,6 @@
 
     <color name="separator_default">#938F99</color>
     <color name="separator_default_contrast">#6C757D </color>
+
+    <color name="shimmer_placeholder">#404040</color>
 </resources>

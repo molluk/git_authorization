@@ -12,6 +12,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.asFlow
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
+import ru.molluk.git_authorization.R
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -52,7 +53,7 @@ class NetworkMonitor @Inject constructor(@ApplicationContext private val context
         } catch (e: IllegalArgumentException) {
             Log.w(
                 this.javaClass.simpleName,
-                "NetworkCallback already unregistered or never registered."
+                context.getString(R.string.network_error_callback)
             )
         }
     }

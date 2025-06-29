@@ -22,4 +22,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "git_authorization"
 include(":app")
- 

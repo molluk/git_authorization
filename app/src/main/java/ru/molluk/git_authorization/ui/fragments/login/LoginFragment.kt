@@ -10,6 +10,8 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import ru.molluk.git_authorization.R
@@ -25,6 +27,8 @@ class LoginFragment : Fragment() {
 
     private val viewModel: LoginViewModel by viewModels()
 
+    private val args: LoginFragmentArgs by navArgs()
+
     private var loginStrBuilder = StringBuilder()
     private var tokenStrBuilder = StringBuilder()
 
@@ -38,7 +42,6 @@ class LoginFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = LoginFragmentBinding.inflate(inflater, container, false)
-
         return binding!!.root
     }
 
@@ -52,6 +55,14 @@ class LoginFragment : Fragment() {
     }
 
     private fun initViews() {
+        binding?.toolbar?.visibility = if (args.goBackFragment) {
+            binding?.toolbar?.setNavigationOnClickListener {
+                findNavController().navigateUp()
+            }
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
         binding?.loginTextInput?.fadeVisibility(View.VISIBLE, 250)
         binding?.loginTextEdit?.addTextChangedListener(object : CustomTextWatcher {
             override fun afterTextChanged(s: Editable?) {
@@ -60,12 +71,18 @@ class LoginFragment : Fragment() {
                 if (s?.count()!! >= 1) {
                     binding?.buttonCardContainer?.isClickable = true
                     if (binding?.motionLayout?.currentState == R.id.initial_state_button_hidden) {
-                        binding?.motionLayout?.transitionToState(R.id.initial_state_button_visible, 250)
+                        binding?.motionLayout?.transitionToState(
+                            R.id.initial_state_button_visible,
+                            250
+                        )
                     }
                 } else {
                     binding?.buttonCardContainer?.isClickable
                     if (tokenStrBuilder.isEmpty() && loginStrBuilder.isEmpty()) {
-                        binding?.motionLayout?.transitionToState(R.id.initial_state_button_hidden, 250)
+                        binding?.motionLayout?.transitionToState(
+                            R.id.initial_state_button_hidden,
+                            250
+                        )
                     }
                 }
             }
@@ -79,12 +96,18 @@ class LoginFragment : Fragment() {
                 if (s?.count()!! >= 6) {
                     binding?.buttonCardContainer?.isClickable = true
                     if (binding?.motionLayout?.currentState == R.id.initial_state_button_hidden) {
-                        binding?.motionLayout?.transitionToState(R.id.initial_state_button_visible, 250)
+                        binding?.motionLayout?.transitionToState(
+                            R.id.initial_state_button_visible,
+                            250
+                        )
                     }
                 } else {
                     binding?.buttonCardContainer?.isClickable = false
                     if (loginStrBuilder.isEmpty() && tokenStrBuilder.isEmpty()) {
-                        binding?.motionLayout?.transitionToState(R.id.initial_state_button_hidden, 250)
+                        binding?.motionLayout?.transitionToState(
+                            R.id.initial_state_button_hidden,
+                            250
+                        )
                     }
                 }
             }
@@ -94,9 +117,11 @@ class LoginFragment : Fragment() {
     private fun initClickers() {
         binding?.buttonCardContainer?.setOnClickListener {
             if (tokenStrBuilder.isEmpty() && loginStrBuilder.isNotEmpty()) {
-                viewModel.getUserWithoutToken(loginStrBuilder.toString())
-            } else if (tokenStrBuilder.isNotEmpty() &&loginStrBuilder.isEmpty()){
-                viewModel.getNewUser("Bearer " + tokenStrBuilder.toString())
+                viewModel.getUserResponse(login = loginStrBuilder.toString())
+            } else if (tokenStrBuilder.isNotEmpty() && loginStrBuilder.isEmpty()) {
+                viewModel.getUserResponse(token = "$tokenStrBuilder")
+            } else if (tokenStrBuilder.isNotEmpty() && loginStrBuilder.isNotEmpty()) {
+                viewModel.getUserResponse(token = "$tokenStrBuilder")
             } else {
                 binding?.buttonCardContainer?.isClickable = false
                 binding?.motionLayout?.transitionToState(R.id.start_button_visible)
@@ -108,7 +133,6 @@ class LoginFragment : Fragment() {
     private fun setObserveListener() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.user.collect { state ->
-                Log.d(this@LoginFragment.javaClass.simpleName, "Received state: $state")
                 when (state) {
                     is UiState.Error -> {
                         val userOrToken = if (loginStrBuilder.isNotEmpty()) {
@@ -132,14 +156,21 @@ class LoginFragment : Fragment() {
                         binding?.motionLayout?.transitionToState(R.id.end_progress_visible)
                     }
 
-                    is UiState.Success -> {
-                        loadingProcess(false)
-                    }
+                    is UiState.Success -> {}
 
                     else -> {
                         loadingProcess(false)
                         binding?.motionLayout?.transitionToState(R.id.start_button_visible)
                     }
+                }
+            }
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.userProfile.collect { user ->
+                loadingProcess(false)
+                user?.let {
+                    val action = LoginFragmentDirections.actionLoginFragmentToHomeFragment(it)
+                    findNavController().navigate(action)
                 }
             }
         }
