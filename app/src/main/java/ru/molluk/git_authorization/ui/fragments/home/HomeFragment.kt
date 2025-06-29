@@ -104,9 +104,11 @@ class HomeFragment : Fragment() {
                         }
 
                     selectedProfile?.let {
-                        currentPage = 1
-                        this.userProfile = it
-                        viewModel.getUserResponse(userProfile = it, changeUser = true)
+                        if (selectedProfile.id != userProfile.id) {
+                            currentPage = 1
+                            this.userProfile = it
+                            viewModel.getUserResponse(userProfile = it, changeUser = true)
+                        }
                     }
                 }
 
@@ -187,6 +189,7 @@ class HomeFragment : Fragment() {
             viewModel.user.collect { user ->
                 when (user) {
                     is UiState.Loading -> {
+                        isLastPage = false
                         binding?.shimmerToolbar?.visibility = View.VISIBLE
                         binding?.shimmerToolbar?.startShimmer()
                         binding?.profileCl?.visibility = View.GONE
@@ -227,6 +230,7 @@ class HomeFragment : Fragment() {
                     }
 
                     is UiState.Error -> {
+                        binding?.refreshLayout?.isRefreshing = false
                         Log.e(
                             this.javaClass.simpleName,
                             "${user.message}, ${user.throwable}: stackTrace: "
@@ -302,7 +306,6 @@ class HomeFragment : Fragment() {
                                 val nextUser =
                                     users.data.first { it.id != userResponse.id.toString() }
                                 userProfile = nextUser
-                                viewModel.saveUser(nextUser)
                                 viewModel.getUserResponse(nextUser)
                             }
                             isUserDeleted = false

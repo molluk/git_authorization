@@ -9,7 +9,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.Fragment
@@ -67,28 +66,6 @@ class SplashScreenFragment : Fragment() {
 
                     is UiState.Error -> {
                         Log.e(this.javaClass.simpleName, "Error loading octocat: ${state.message}")
-                    }
-                }
-            }
-        }
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.isNetworkAvailable.collect { isAvailable ->
-                if (isAvailable) {
-                    Log.d(this.javaClass.simpleName, "Интернет доступен")
-                } else {
-                    Log.e(this.javaClass.simpleName, "Интернет недоступен")
-                    viewModel.octocat.collect { state ->
-                        if (viewModel.octocat.replayCache.lastOrNull() !is UiState.Loading &&
-                            viewModel.octocat.replayCache.lastOrNull() !is UiState.Success
-                        ) {
-                            binding?.progressCircular?.fadeVisibility(View.GONE)
-                            Toast.makeText(
-                                requireContext(),
-                                "Нет подключения к интернету",
-                                Toast.LENGTH_LONG
-                            )
-                                .show()
-                        }
                     }
                 }
             }

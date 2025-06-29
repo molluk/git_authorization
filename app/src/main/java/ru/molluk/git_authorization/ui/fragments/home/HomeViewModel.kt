@@ -37,7 +37,7 @@ class HomeViewModel @Inject constructor(
     private val _repos = MutableSharedFlow<UiState<List<ReposResponse>>>()
     val repos = _repos.asSharedFlow()
 
-    fun saveUser(profile: UserProfile) {
+    private fun saveUser(profile: UserProfile) {
         viewModelScope.launch {
             tokenManager.setActiveProfile(profile.id)
             profileRepository.deactivateAllProfiles()

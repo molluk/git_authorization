@@ -54,4 +54,11 @@
     <string name="fallback_error_server">Server error.</string>
     <string name="fallback_error_generic_network">Network error.</string>
     <string name="fallback_error_unknown">Unknown error.</string>
+
+    <string name="notification_channel_name_network">Network status</string>
+    <string name="notification_channel_description_network">Network connection change notifications</string>
+    <string name="notification_title_network_lost">Internet connection lost</string>
+    <string name="notification_text_network_lost">Check your Internet connection. </string>
+    <string name="notification_title_network_restored">Internet connection restored</string>
+    <string name="notification_text_network_restored">You\'re back online! </string>
 </resources>

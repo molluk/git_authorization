@@ -5,7 +5,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import ru.molluk.git_authorization.R
@@ -14,7 +13,6 @@ import ru.molluk.git_authorization.data.repository.OctocatRepositoryImpl
 import ru.molluk.git_authorization.data.repository.ProfileRepository
 import ru.molluk.git_authorization.utils.DefaultViewModel
 import ru.molluk.git_authorization.utils.DomainException
-import ru.molluk.git_authorization.utils.NetworkMonitor
 import ru.molluk.git_authorization.utils.UiState
 import javax.inject.Inject
 
@@ -23,29 +21,14 @@ class SplashScreenViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val application: Application,
     private val octocatRepository: OctocatRepositoryImpl,
-    private val networkMonitor: NetworkMonitor,
     private val profileRepository: ProfileRepository
 ) : DefaultViewModel() {
-
-    private val _isNetworkAvailable = MutableStateFlow(networkMonitor.hasInternetConnection())
-    val isNetworkAvailable = _isNetworkAvailable.asSharedFlow()
 
     private val _octocat = MutableSharedFlow<UiState<String>>(1)
     val octocat = _octocat.asSharedFlow()
 
     private val _user = MutableSharedFlow<UiState<UserProfile>>()
     val user = _user.asSharedFlow()
-
-    init {
-        viewModelScope.launch {
-            _isNetworkAvailable.emit(networkMonitor.hasInternetConnection())
-
-            networkMonitor.observeNetworkChanges()
-                .collect { isAvailable ->
-                    _isNetworkAvailable.value = isAvailable
-                }
-        }
-    }
 
     fun getUserActive() {
         viewModelScope.launch {
@@ -70,11 +53,6 @@ class SplashScreenViewModel @Inject constructor(
 
     fun fetchOctocat() {
         viewModelScope.launch {
-            if (!networkMonitor.hasInternetConnection()) {
-                _octocat.emit(UiState.Error(application.getString(R.string.network_error_no_connection)))
-                return@launch
-            }
-
             _octocat.emit(UiState.Loading)
             try {
                 val response = octocatRepository.getOctocat()
