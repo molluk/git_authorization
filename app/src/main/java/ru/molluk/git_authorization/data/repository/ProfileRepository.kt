@@ -15,10 +15,6 @@ class ProfileRepository @Inject constructor(
         profileDao.setProfileAsActive(profile.id)
     }
 
-    suspend fun getProfile(profile: UserProfile): UserProfile? {
-        return profileDao.getProfile(profile.id)
-    }
-
     suspend fun getAllProfiles(): List<UserProfile> {
         return profileDao.getAllProfiles()
     }
@@ -29,10 +25,6 @@ class ProfileRepository @Inject constructor(
 
     suspend fun deactivateAllProfiles() {
         profileDao.deactivateAllProfiles()
-    }
-
-    suspend fun deleteProfileById(id: String) {
-        profileDao.deleteProfileById(id)
     }
 
     suspend fun deleteProfile(profile: UserProfile) {

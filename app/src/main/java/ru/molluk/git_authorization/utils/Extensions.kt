@@ -1,7 +1,8 @@
 package ru.molluk.git_authorization.utils
 
-import android.content.Context
-import android.util.Patterns
+import android.os.Build
+import android.os.Bundle
+import android.os.Parcelable
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -38,21 +39,20 @@ fun View.fadeVisibility(
     }
 }
 
-fun isValidEmail(email: String?): Boolean {
-    return if (email.isNullOrEmpty()) {
-        false
-    } else {
-        Patterns.EMAIL_ADDRESS.matcher(email).matches()
-    }
-}
-
 fun String.formatToDateYMD(): String {
     val instant = Instant.parse(this)
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     return formatter.format(instant.atZone(java.time.ZoneId.systemDefault()))
 }
 
-fun Int.dpToPx(context: Context): Int = (this * context.resources.displayMetrics.density).toInt()
+inline fun <reified T : Parcelable> Bundle.getParcelableFromBundle(key: String): T? {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        this.getParcelable(key, T::class.java)
+    } else {
+        @Suppress("DEPRECATION")
+        this.getParcelable(key) as? T
+    }
+}
 
 fun AppCompatActivity.observeNetworkStatusAndShowSnackbar(
     networkStateSource: LiveData<Boolean>,
@@ -100,5 +100,18 @@ fun AppCompatActivity.observeNetworkStatusAndShowSnackbar(
             }
         }
         previousNetworkStateForSnackbar = currentState
+    }
+}
+
+fun parseDomainException(e: DomainException): String {
+    return when (e) {
+        is DomainException.NoInternet -> e.customMessage
+        is DomainException.Unauthorized -> e.message ?: "Ошибка авторизации."
+        is DomainException.Forbidden -> e.message ?: "Доступ запрещен."
+        is DomainException.ApiRateLimitExceeded -> e.message ?: "Превышен лимит запросов."
+        is DomainException.NotFound -> e.message ?: "Не найдено."
+        is DomainException.ServerError -> e.message ?: "Ошибка сервера."
+        is DomainException.GenericNetworkError -> e.customMessage
+        is DomainException.Unknown -> e.customMessage
     }
 }

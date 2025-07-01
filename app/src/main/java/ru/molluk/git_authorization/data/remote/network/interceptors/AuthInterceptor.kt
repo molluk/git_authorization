@@ -5,24 +5,21 @@ import okhttp3.Interceptor
 import okhttp3.Response
 import ru.molluk.git_authorization.data.auth.TokenManager
 
-class AuthInterceptor constructor(
+class AuthInterceptor(
     private val tokenManager: TokenManager
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        val token = runBlocking {
-            tokenManager.getActiveToken()
+        val original = chain.request()
+        val builder = original.newBuilder()
+
+        runBlocking {
+            val token = tokenManager.getActiveToken() ?: tokenManager.getTemporaryToken()
+            token?.let {
+                builder.addHeader("Authorization", "Bearer $it")
+            }
         }
 
-        val request = chain.request()
-            .newBuilder()
-            .apply {
-                token?.let {
-                    addHeader("Authorization", "Bearer $it")
-                }
-            }
-            .build()
-
-        return chain.proceed(request)
+        return chain.proceed(builder.build())
     }
 }

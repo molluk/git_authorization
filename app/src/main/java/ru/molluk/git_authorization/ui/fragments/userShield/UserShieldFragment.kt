@@ -237,14 +237,14 @@ class UserShieldFragment : BottomSheetDialogFragment() {
                     state = BottomSheetBehavior.STATE_HALF_EXPANDED
 
                     val itemCount = binding?.recyclerView?.adapter?.itemCount ?: 0
-                    when {
-                        itemCount == 0 -> {
+                    when (itemCount) {
+                        0 -> {
                             halfExpandedRatio = 0.1f
                         }
-                        itemCount == 1 -> {
+                        1 -> {
                             halfExpandedRatio = 0.15f
                         }
-                        itemCount in 2..5 -> {
+                        in 2..5 -> {
                             halfExpandedRatio = itemCount * 0.1f
                         }
                         else -> {

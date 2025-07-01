@@ -4,7 +4,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -28,6 +27,9 @@ import ru.molluk.git_authorization.utils.UiState
 import ru.molluk.git_authorization.utils.formatToDateYMD
 import kotlin.getValue
 import androidx.core.net.toUri
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.flow.collectLatest
 import ru.molluk.git_authorization.R
 import ru.molluk.git_authorization.ui.fragments.userShield.UserShieldFragment.Companion.ACTION_TYPE_KEY
 import ru.molluk.git_authorization.ui.fragments.userShield.UserShieldFragment.Companion.ACTION_USER_DELETED
@@ -36,22 +38,17 @@ import ru.molluk.git_authorization.ui.fragments.userShield.UserShieldFragment.Co
 import ru.molluk.git_authorization.ui.fragments.userShield.UserShieldFragment.Companion.REQUEST_USER_KEY
 import ru.molluk.git_authorization.ui.fragments.userShield.UserShieldFragment.Companion.SELECTED_USER_PROFILE_KEY
 import ru.molluk.git_authorization.utils.fadeVisibility
+import ru.molluk.git_authorization.utils.getParcelableFromBundle
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
 
     private var binding: HomeFragmentBinding? = null
     private val args: HomeFragmentArgs by navArgs()
-
     private val viewModel: HomeViewModel by viewModels()
-
-    private lateinit var userProfile: UserProfile
-    private lateinit var userResponse: UserResponse
 
     private var currentPage = 1
     private var isLastPage = false
-    private var isLoadingData = false
-    private var isUserDeleted = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,17 +69,17 @@ class HomeFragment : Fragment() {
         initViews()
         initClickers()
         setObserveListener()
+
+        args.userProfile?.let {
+            viewModel.switchActiveUserProfile(it)
+        }
     }
 
     private fun initViews() {
-        args.userProfile?.let {
-            userProfile = it
-            viewModel.getUserResponse(it)
-        }
         binding?.reposRv?.adapter = GitReposAdapter()
 
         binding?.refreshLayout?.setOnRefreshListener {
-            viewModel.getUserResponse(userProfile)
+            viewModel.loadCurrentActiveUser()
         }
 
         childFragmentManager.setFragmentResultListener(
@@ -97,30 +94,21 @@ class HomeFragment : Fragment() {
 
                 ACTION_USER_SELECTED -> {
                     val selectedProfile: UserProfile? =
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            bundle.getParcelable(SELECTED_USER_PROFILE_KEY, UserProfile::class.java)
-                        } else {
-                            bundle.getParcelable(SELECTED_USER_PROFILE_KEY)
-                        }
+                        bundle.getParcelableFromBundle(SELECTED_USER_PROFILE_KEY)
 
-                    selectedProfile?.let {
-                        if (selectedProfile.id != userProfile.id) {
-                            currentPage = 1
-                            this.userProfile = it
-                            viewModel.getUserResponse(userProfile = it, changeUser = true)
+                    selectedProfile?.let { profile ->
+                        val currentUserId =
+                            (viewModel.user.value as? UiState.Success)?.data?.first?.id.toString()
+                        if (profile.id != currentUserId) {
+                            viewModel.switchActiveUserProfile(profile)
                         }
                     }
                 }
 
                 ACTION_USER_DELETED -> {
-                    val userDeleted: UserProfile? =
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            bundle.getParcelable(DELETED_USER_PROFILE_KEY, UserProfile::class.java)
-                        } else {
-                            bundle.getParcelable(DELETED_USER_PROFILE_KEY)
-                        }
-                    userDeleted?.let {
-                        isUserDeleted = true
+                    val deletedProfile: UserProfile? =
+                        bundle.getParcelableFromBundle(DELETED_USER_PROFILE_KEY)
+                    deletedProfile?.let {
                         viewModel.deleteUser(it)
                     }
                 }
@@ -138,7 +126,7 @@ class HomeFragment : Fragment() {
             copyLinkClickListener = { item ->
                 val clipboardManager =
                     requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                val clipData = ClipData.newPlainText(item.name, item.url)
+                val clipData = ClipData.newPlainText(item.name, item.htmlUrl)
                 clipboardManager.setPrimaryClip(clipData)
 
                 Toast.makeText(
@@ -176,9 +164,11 @@ class HomeFragment : Fragment() {
                 }
             }
             loadNextPage = {
-                if (!isLastPage && !isLoadingData) {
+                val currentUserLogin =
+                    (viewModel.user.value as? UiState.Success)?.data?.first?.login
+                if (!isLastPage && currentUserLogin != null) {
                     currentPage++
-                    viewModel.getRepository(userProfile, currentPage)
+                    viewModel.loadReposForCurrentUser(currentUserLogin, currentPage)
                 }
             }
         }
@@ -186,60 +176,46 @@ class HomeFragment : Fragment() {
 
     private fun setObserveListener() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.user.collect { user ->
-                when (user) {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.speedKbps.collect { speed ->
+                    binding?.networkSpeedKbps?.text =
+                        requireContext().getString(R.string.network_speed, speed)
+                }
+            }
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.user.collectLatest { combinedState ->
+                binding?.refreshLayout?.isRefreshing = combinedState is UiState.Loading
+                when (combinedState) {
                     is UiState.Loading -> {
-                        isLastPage = false
-                        binding?.shimmerToolbar?.visibility = View.VISIBLE
-                        binding?.shimmerToolbar?.startShimmer()
-                        binding?.profileCl?.visibility = View.GONE
-                        binding?.shimmerRepos?.visibility = View.VISIBLE
-                        binding?.shimmerRepos?.startShimmer()
-                        binding?.reposRv?.visibility = View.GONE
+                        showUserLoadingState(true)
                         (binding?.reposRv?.adapter as GitReposAdapter).clearData()
+                        isLastPage = false
+                        currentPage = 1
                     }
 
                     is UiState.Success -> {
-                        binding?.shimmerToolbar?.stopShimmer()
-                        binding?.shimmerToolbar?.visibility = View.GONE
-                        binding?.profileCl?.visibility = View.VISIBLE
-                        userResponse = user.data
-                        binding?.profileLogin?.text = userResponse.login
-                        binding?.profileId?.text =
-                            requireContext().getString(R.string.user_id, userResponse.id.toString())
-                        binding?.profileCreatedDate?.text = userResponse.createdAt.formatToDateYMD()
-                        binding?.profileToken?.apply {
-                            if (userProfile.accessToken.isNullOrEmpty()) {
-                                text = requireContext().getString(R.string.token_not_specified)
-                                setTextColor(ContextCompat.getColor(context, R.color.error_default))
-                            } else {
-                                text = requireContext().getString(R.string.token_specified)
-                                setTextColor(
-                                    ContextCompat.getColor(
-                                        context,
-                                        R.color.element_active
-                                    )
-                                )
-                            }
-                        }
-                        Glide.with(requireContext()).load(userResponse.avatarUrl)
-                            .into(binding?.profileAvatar!!)
+                        val userResponse = combinedState.data.first
+                        val activeProfile = combinedState.data.second
 
-                        viewModel.getAllUsers()
-                        viewModel.getRepository(userProfile)
+                        showUserLoadingState(false)
+                        updateUserInfo(userResponse, activeProfile)
+                        viewModel.loadReposForCurrentUser(userResponse.login, currentPage)
                     }
 
                     is UiState.Error -> {
+                        showUserLoadingState(false)
+
                         binding?.refreshLayout?.isRefreshing = false
                         Log.e(
                             this.javaClass.simpleName,
-                            "${user.message}, ${user.throwable}: stackTrace: "
+                            "${combinedState.message}, ${combinedState.throwable}: stackTrace: "
                         )
-                        user.throwable?.printStackTrace()
+                        combinedState.throwable?.printStackTrace()
 
                         Toast.makeText(
                             requireContext(),
-                            user.message,
+                            combinedState.message,
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -248,29 +224,42 @@ class HomeFragment : Fragment() {
         }
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.repos.collect { repos ->
+                val isLoading = repos is UiState.Loading
+                (binding?.reposRv?.adapter as GitReposAdapter).setLoading(isLoading)
+
                 when (repos) {
                     is UiState.Loading -> {
+                        if (currentPage == 1) {
+                            showReposLoadingState(true)
+                        }
+
                         binding?.progressRv?.show()
                         (binding?.reposRv?.adapter as GitReposAdapter).setLoading(true)
                     }
 
                     is UiState.Success -> {
-                        binding?.shimmerRepos?.hideShimmer()
-                        binding?.shimmerRepos?.visibility = View.GONE
-                        binding?.reposRv?.visibility = View.VISIBLE
                         binding?.progressRv?.hide()
+                        showReposLoadingState(false)
+
                         val data = repos.data
+                        val reposAdapter = (binding?.reposRv?.adapter as GitReposAdapter)
+                        reposAdapter.setLoading(false)
+
                         if (data.isNotEmpty()) {
-                            (binding?.reposRv?.adapter as GitReposAdapter).addData(data)
+                            if (currentPage == 1) {
+                                reposAdapter.setData(data)
+                            } else {
+                                reposAdapter.addData(data)
+                            }
+                            isLastPage = false
                         } else {
                             isLastPage = true
                         }
-                        (binding?.reposRv?.adapter as GitReposAdapter).setLoading(false)
+
                         binding?.refreshLayout?.isRefreshing = false
                     }
 
                     is UiState.Error -> {
-                        (binding?.reposRv?.adapter as GitReposAdapter).setLoading(false)
                         binding?.progressRv?.hide()
                         binding?.refreshLayout?.isRefreshing = false
                         Log.e(
@@ -302,13 +291,6 @@ class HomeFragment : Fragment() {
                         if (users.data.isNotEmpty()) {
                             binding?.profileCountCw?.fadeVisibility(if (users.data.size > 1) View.VISIBLE else View.GONE)
                             binding?.profileCountText?.text = (users.data.size).toString()
-                            if (isUserDeleted) {
-                                val nextUser =
-                                    users.data.first { it.id != userResponse.id.toString() }
-                                userProfile = nextUser
-                                viewModel.getUserResponse(nextUser)
-                            }
-                            isUserDeleted = false
                         } else {
                             val action =
                                 HomeFragmentDirections.actionHomeFragmentLogoutToLoginFragment(false)
@@ -321,6 +303,51 @@ class HomeFragment : Fragment() {
                     }
                 }
             }
+        }
+    }
+
+    private fun updateUserInfo(user: UserResponse, activeProfile: UserProfile?) {
+        binding?.profileLogin?.text = user.login
+        binding?.profileId?.text = getString(R.string.user_id, user.id.toString())
+        binding?.profileCreatedDate?.text = user.createdAt.formatToDateYMD()
+
+        binding?.profileToken?.apply {
+            if (activeProfile?.accessToken.isNullOrEmpty()) {
+                text = getString(R.string.token_not_specified)
+                setTextColor(ContextCompat.getColor(context, R.color.error_default))
+            } else {
+                text = getString(R.string.token_specified)
+                setTextColor(ContextCompat.getColor(context, R.color.element_active))
+            }
+        }
+        Glide.with(requireContext()).load(user.avatarUrl).into(binding?.profileAvatar!!)
+    }
+
+    private fun showUserLoadingState(isLoading: Boolean) {
+        if (isLoading) {
+            binding?.shimmerToolbar?.visibility = View.VISIBLE
+            binding?.shimmerToolbar?.startShimmer()
+            binding?.profileCl?.visibility = View.GONE
+            binding?.shimmerRepos?.visibility = View.VISIBLE
+            binding?.shimmerRepos?.startShimmer()
+            binding?.reposRv?.visibility = View.GONE
+        } else {
+            binding?.shimmerToolbar?.stopShimmer()
+            binding?.shimmerToolbar?.visibility = View.GONE
+            binding?.profileCl?.visibility = View.VISIBLE
+        }
+    }
+
+    private fun showReposLoadingState(isLoading: Boolean) {
+        if (isLoading && currentPage == 1) {
+            binding?.shimmerRepos?.visibility = View.VISIBLE
+            binding?.shimmerRepos?.startShimmer()
+            binding?.reposRv?.visibility = View.GONE
+        } else {
+            binding?.shimmerRepos?.hideShimmer()
+            binding?.shimmerRepos?.visibility = View.GONE
+            binding?.reposRv?.visibility = View.VISIBLE
+            binding?.progressRv?.hide()
         }
     }
 

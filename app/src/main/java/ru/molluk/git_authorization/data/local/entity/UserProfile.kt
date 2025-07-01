@@ -13,7 +13,7 @@ data class UserProfile(
     val login: String,
     val avatarUrl: String,
     @ColumnInfo(defaultValue = "UNKNOWN_DATE")
-    val createdAt: String,
+    val createdAt: String = "UNKNOWN_DATE",
     val accessToken: String?,
     val isActive: Boolean = false
 ) : Parcelable

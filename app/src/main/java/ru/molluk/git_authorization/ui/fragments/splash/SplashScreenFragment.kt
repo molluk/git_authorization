@@ -85,7 +85,7 @@ class SplashScreenFragment : Fragment() {
                     is UiState.Error -> {
                         binding?.progressCircular?.fadeVisibility(View.GONE, 200, onEnd = {
                             binding?.let { bind ->
-                                animateViewToBias(bind.gitLogoIv, 0.2f, bind.root, 200) {
+                                animateViewToBias(bind.gitLogoIv, bind.root) {
                                     findNavController().navigate(R.id.action_splashFragment_to_loginFragment)
                                 }
                             }
@@ -98,15 +98,13 @@ class SplashScreenFragment : Fragment() {
 
     private fun animateViewToBias(
         view: View,
-        targetBias: Float,
         parent: ViewGroup,
-        duration: Long = 500L,
         onAnimationEnd: (() -> Unit)? = null
     ) {
         val constraintLayout = parent as ConstraintLayout
 
         val transition = AutoTransition()
-        transition.duration = duration
+        transition.duration = 200
         onAnimationEnd?.let { entAnim ->
             transition.addListener(object : Transition.TransitionListener {
                 override fun onTransitionStart(p0: Transition?) {}
@@ -127,7 +125,7 @@ class SplashScreenFragment : Fragment() {
         val endSet = ConstraintSet()
         endSet.clone(constraintLayout)
 
-        endSet.setVerticalBias(view.id, targetBias)
+        endSet.setVerticalBias(view.id, 0.2f)
 
         TransitionManager.beginDelayedTransition(constraintLayout, transition)
         endSet.applyTo(constraintLayout)
