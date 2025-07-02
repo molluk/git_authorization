@@ -1,7 +1,6 @@
 package ru.molluk.git_authorization.ui.fragments.userShield
 
 import android.app.Application
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -17,7 +16,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UsersShieldViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
     private val application: Application,
     val profileRepository: ProfileRepository,
 ) : DefaultViewModel() {

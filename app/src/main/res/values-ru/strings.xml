@@ -41,7 +41,6 @@
     <string name="error_unknown_http">Необработанная HTTP ошибка: %1$d</string>
 
     <string name="error_login_or_token_empty">Логин или токен не могут быть пустыми.</string>
-    <string name="error_load_user_formatted">Не удалось загрузить пользователя %1$s, %2$s</string>
 
     <string name="fallback_error_no_internet">Проверьте ваше интернет-соединение.</string>
     <string name="fallback_error_unauthorized">Ошибка авторизации.</string>
@@ -58,4 +57,8 @@
     <string name="notification_text_network_lost">Проверьте ваше интернет соединение.</string>
     <string name="notification_title_network_restored">Интернет соединение восстановлено</string>
     <string name="notification_text_network_restored">Вы снова онлайн!</string>
+
+    <string name="permission_notify_done">Разрешение на уведомления получено</string>
+    <string name="permission_notify_denied">Разрешите показ уведомлений, чтобы мы могли сообщать о важных событиях.</string>
+    <string name="network_speed">Скорость: %s</string>
 </resources>

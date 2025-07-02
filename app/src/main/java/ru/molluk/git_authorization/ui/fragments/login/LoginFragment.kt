@@ -116,12 +116,8 @@ class LoginFragment : Fragment() {
 
     private fun initClickers() {
         binding?.buttonCardContainer?.setOnClickListener {
-            if (tokenStrBuilder.isEmpty() && loginStrBuilder.isNotEmpty()) {
-                viewModel.getUserResponse(login = loginStrBuilder.toString())
-            } else if (tokenStrBuilder.isNotEmpty() && loginStrBuilder.isEmpty()) {
-                viewModel.getUserResponse(token = "$tokenStrBuilder")
-            } else if (tokenStrBuilder.isNotEmpty() && loginStrBuilder.isNotEmpty()) {
-                viewModel.getUserResponse(token = "$tokenStrBuilder")
+            if (tokenStrBuilder.isNotEmpty() || loginStrBuilder.isNotEmpty()) {
+                viewModel.attemptLoginOrFetchUser(loginStrBuilder.toString(), tokenStrBuilder.toString())
             } else {
                 binding?.buttonCardContainer?.isClickable = false
                 binding?.motionLayout?.transitionToState(R.id.start_button_visible)
@@ -156,9 +152,7 @@ class LoginFragment : Fragment() {
                         binding?.motionLayout?.transitionToState(R.id.end_progress_visible)
                     }
 
-                    is UiState.Success -> {}
-
-                    else -> {
+                    is UiState.Success -> {
                         loadingProcess(false)
                         binding?.motionLayout?.transitionToState(R.id.start_button_visible)
                     }

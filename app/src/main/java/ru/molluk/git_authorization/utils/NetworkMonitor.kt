@@ -6,12 +6,8 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
-import android.net.NetworkRequest
-import android.os.Build
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.asFlow
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.Flow
 import ru.molluk.git_authorization.R
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -26,25 +22,10 @@ class NetworkMonitor @Inject constructor(
 
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
 
-    fun observeNetworkChanges(): Flow<Boolean> {
-        return this.asFlow()
-    }
-
     override fun onActive() {
         super.onActive()
         updateConnection()
-        when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.N -> {
-                connectivityManager.registerDefaultNetworkCallback(getNetworkCallback())
-            }
-
-            else -> {
-                val networkRequest = NetworkRequest.Builder()
-                    .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-                    .build()
-                connectivityManager.registerNetworkCallback(networkRequest, getNetworkCallback())
-            }
-        }
+        connectivityManager.registerDefaultNetworkCallback(getNetworkCallback())
     }
 
     override fun onInactive() {
@@ -56,6 +37,7 @@ class NetworkMonitor @Inject constructor(
                 this.javaClass.simpleName,
                 context.getString(R.string.network_error_callback)
             )
+            e.printStackTrace()
         }
     }
 
@@ -103,17 +85,5 @@ class NetworkMonitor @Inject constructor(
             capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
                     capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
         )
-    }
-
-    fun hasInternetConnection(): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            val activeNetwork = connectivityManager.activeNetworkInfo
-            return activeNetwork?.isConnected == true
-        } else {
-            val network = connectivityManager.activeNetwork ?: return false
-            val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
-            return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
-                    capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
-        }
     }
 }

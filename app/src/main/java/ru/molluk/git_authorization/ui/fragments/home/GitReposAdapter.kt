@@ -1,7 +1,6 @@
 package ru.molluk.git_authorization.ui.fragments.home
 
-import android.os.Handler
-import android.os.Looper
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -24,27 +23,32 @@ class GitReposAdapter() :
 
     override fun onBindViewHolder(holder: GitReposViewHolder, position: Int) {
         val currentItem = getItem(position)
-        holder.bind(currentItem, position)
+        holder.bind(currentItem)
 
-        if (!isLoading && position >= itemCount - visibleThreshold && itemCount > 0) {
-            Handler(Looper.getMainLooper()).post {
-                isLoading = true
-                loadNextPage?.invoke()
-            }
+        if (!isLoading && position >= itemCount - visibleThreshold && itemCount >= visibleThreshold) {
+            loadNextPage?.invoke()
         }
     }
 
+    fun setData(newItems: List<ReposResponse>) {
+        submitList(newItems)
+    }
+
     fun addData(newItems: List<ReposResponse>) {
+        if (newItems.isEmpty()) {
+            isLoading = false
+            return
+        }
         val currentList = currentList.toMutableList()
         currentList.addAll(newItems)
         submitList(currentList)
         isLoading = false
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun clearData() {
         submitList(emptyList())
         isLoading = false
-        notifyDataSetChanged()
     }
 
     fun setLoading(isLoading: Boolean) {
@@ -60,7 +64,7 @@ class GitReposAdapter() :
     ) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: ReposResponse, position: Int) {
+        fun bind(item: ReposResponse) {
             binding.reposName.text = item.name
             binding.reposId.text = item.id.toString()
             binding.reposVisibility.text = item.visibility

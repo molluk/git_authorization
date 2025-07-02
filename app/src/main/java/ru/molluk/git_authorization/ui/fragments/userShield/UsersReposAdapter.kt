@@ -35,8 +35,6 @@ class UsersReposAdapter() : RecyclerView.Adapter<UsersReposViewHolder>() {
 
     fun getUser(position: Int) = usersList[position]
 
-    fun getSize() = usersList.size
-
     fun deleteDataPosition(position: Int) {
         usersList.removeAt(position)
         notifyItemRemoved(position)

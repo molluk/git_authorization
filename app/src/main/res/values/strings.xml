@@ -44,7 +44,6 @@
     <string name="error_unknown_http">Unhandled HTTP error: %1$d</string>
 
     <string name="error_login_or_token_empty">Login or token cannot be empty.</string>
-    <string name="error_load_user_formatted">Failed to load user %1$s, %2$s</string>
 
     <string name="fallback_error_no_internet">Please check your internet connection.</string>
     <string name="fallback_error_unauthorized">Authorization error.</string>
@@ -61,4 +60,7 @@
     <string name="notification_text_network_lost">Check your Internet connection. </string>
     <string name="notification_title_network_restored">Internet connection restored</string>
     <string name="notification_text_network_restored">You\'re back online! </string>
+    <string name="permission_notify_done">Permission to notify received</string>
+    <string name="permission_notify_denied">Allow notifications to be shown so we can report important events.</string>
+    <string name="network_speed">Speed: %s</string>
 </resources>

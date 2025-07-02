@@ -13,6 +13,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 import ru.molluk.git_authorization.data.auth.TokenManager
 import ru.molluk.git_authorization.data.remote.api.GitHubApiService
 import ru.molluk.git_authorization.data.remote.api.OctocatApiService
+import ru.molluk.git_authorization.data.remote.network.NetworkSpeedMonitor
 import ru.molluk.git_authorization.data.remote.network.interceptors.AuthInterceptor
 import ru.molluk.git_authorization.data.remote.network.interceptors.ErrorHandlingInterceptor
 import javax.inject.Singleton
@@ -27,11 +28,13 @@ object NetworkModule {
     @Singleton
     fun provideOkHttpClient(
         authInterceptor: AuthInterceptor,
-        errorInterceptor: ErrorHandlingInterceptor
+        errorInterceptor: ErrorHandlingInterceptor,
+        speedMonitor: NetworkSpeedMonitor
     ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
             .addInterceptor(errorInterceptor)
+            .addInterceptor(speedMonitor)
             .addInterceptor(HttpLoggingInterceptor().apply {
                 level = Level.BODY
             })
@@ -66,4 +69,8 @@ object NetworkModule {
     fun provideGitHubApiService(retrofit: Retrofit): GitHubApiService {
         return retrofit.create(GitHubApiService::class.java)
     }
+
+    @Provides
+    @Singleton
+    fun provideNetworkSpeedMonitor(): NetworkSpeedMonitor = NetworkSpeedMonitor()
 }

@@ -129,6 +129,16 @@
                     app:strokeWidth="1dp"
                     tools:src="@drawable/ic_launcher_foreground" />
 
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/network_speed_kbps"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toEndOf="@id/profile_avatar"
+                    app:layout_constraintTop_toBottomOf="@id/profile_avatar"
+                    tools:text="10 КБ/с" />
+
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/profile_count_cw"
                     android:layout_width="wrap_content"

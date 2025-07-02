@@ -1,167 +1,138 @@
 package ru.molluk.git_authorization.ui.fragments.home
 
 import android.app.Application
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.molluk.git_authorization.R
-import ru.molluk.git_authorization.data.auth.TokenManager
 import ru.molluk.git_authorization.data.local.entity.UserProfile
 import ru.molluk.git_authorization.data.model.dto.ReposResponse
 import ru.molluk.git_authorization.data.model.dto.UserResponse
-import ru.molluk.git_authorization.data.repository.GitHubRepositoryImpl
-import ru.molluk.git_authorization.data.repository.ProfileRepository
+import ru.molluk.git_authorization.domain.usecase.home.DeleteUserUseCase
+import ru.molluk.git_authorization.domain.usecase.home.GetActiveUserResponseUseCase
+import ru.molluk.git_authorization.domain.usecase.home.GetAllUsersUseCase
+import ru.molluk.git_authorization.domain.usecase.home.LoadReposForCurrentUserUseCase
+import ru.molluk.git_authorization.domain.usecase.home.NetworkSpeedUseCase
+import ru.molluk.git_authorization.domain.usecase.home.SwitchActiveUserProfileUseCase
 import ru.molluk.git_authorization.utils.DefaultViewModel
-import ru.molluk.git_authorization.utils.DomainException
 import ru.molluk.git_authorization.utils.UiState
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
     private val application: Application,
-    private val gitHubRepository: GitHubRepositoryImpl,
-    private val profileRepository: ProfileRepository,
-    private val tokenManager: TokenManager
+    private val getActiveUserUseCase: GetActiveUserResponseUseCase,
+    private val getAllUsersUseCase: GetAllUsersUseCase,
+    private val deleteUserUseCase: DeleteUserUseCase,
+    private val switchActiveUserProfileUseCase: SwitchActiveUserProfileUseCase,
+    private val loadReposForCurrentUserUseCase: LoadReposForCurrentUserUseCase,
+    networkSpeedUseCase: NetworkSpeedUseCase
 ) : DefaultViewModel() {
 
-    private val _user = MutableSharedFlow<UiState<UserResponse>>()
-    val user = _user.asSharedFlow()
+    private val _user = MutableStateFlow<UiState<UserResponse>>(UiState.Loading)
 
-    private val _users = MutableSharedFlow<UiState<List<UserProfile>>>()
-    val users = _users.asSharedFlow()
+    private val _users = MutableStateFlow<UiState<List<UserProfile>>>(UiState.Loading)
+    val users = _users.asStateFlow()
 
     private val _repos = MutableSharedFlow<UiState<List<ReposResponse>>>()
     val repos = _repos.asSharedFlow()
 
-    private fun saveUser(profile: UserProfile) {
-        viewModelScope.launch {
-            tokenManager.setActiveProfile(profile.id)
-            profileRepository.deactivateAllProfiles()
-            profileRepository.saveProfile(profile)
-            profileRepository.setActiveProfile(profile)
-        }
+    init {
+        loadCurrentActiveUser()
+        getAllUsers()
     }
 
+    val speedKbps: StateFlow<String> = networkSpeedUseCase().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "Н/д")
+
+    val user: StateFlow<UiState<Pair<UserResponse, UserProfile?>>> =
+        _user.combine(users) { userState, usersState ->
+            when {
+                userState is UiState.Loading || (userState is UiState.Success && usersState is UiState.Loading) -> UiState.Loading
+                userState is UiState.Success && usersState is UiState.Success -> {
+                    val currentUserResponse = userState.data
+                    val correspondingProfile =
+                        usersState.data.firstOrNull { it.id == currentUserResponse.id.toString() && it.isActive }
+                    UiState.Success(Pair(currentUserResponse, correspondingProfile))
+                }
+
+                userState is UiState.Error -> UiState.Error(userState.message, userState.throwable)
+                usersState is UiState.Error -> UiState.Error(
+                    usersState.message,
+                    usersState.throwable
+                )
+
+                else -> UiState.Loading
+            }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UiState.Loading)
+
+    /**
+     * Получить список всех сохраненных пользователей
+     */
     fun getAllUsers() {
         viewModelScope.launch {
-            _users.emit(UiState.Loading)
-
-            try {
-                val response = profileRepository.getAllProfiles()
-                _users.emit(UiState.Success(response))
-            } catch (e: DomainException) {
-                val errorMessage = parseDomainException(e)
-                _users.emit(UiState.Error(errorMessage, e))
-            } catch (e: Exception) {
-
+            getAllUsersUseCase().collect { result ->
+                _users.emit(result)
             }
         }
     }
 
-    fun getUserResponse(userProfile: UserProfile, changeUser: Boolean = false) {
+    /**
+     * Вызывается, когда пользователь выбирает другой профиль из списка.
+     * @param userProfile Профиль, который нужно сделать активным.
+     */
+    fun switchActiveUserProfile(userProfile: UserProfile) {
         viewModelScope.launch {
-            _user.emit(UiState.Loading)
-            try {
-                val token = tokenManager.getDecryptedToken(userProfile.accessToken)
-                val response = if (token.isNullOrEmpty()) {
-                    gitHubRepository.getUserWithoutToken(userProfile.login)
-                } else {
-                    gitHubRepository.getUser(if (changeUser == true) token else "")
-                }
-                val newUser = UserProfile(
-                    id = response.id.toString(),
-                    login = response.login,
-                    accessToken = userProfile.accessToken ?: "",
-                    avatarUrl = userProfile.avatarUrl,
-                    createdAt = userProfile.createdAt,
-                    isActive = true
-                )
-                saveUser(newUser)
-                _user.emit(UiState.Success(response))
-            } catch (e: DomainException) {
-                val errorMessage = parseDomainException(e)
-                _user.emit(UiState.Error(errorMessage, e))
-            } catch (e: Exception) {
-                _user.emit(
-                    UiState.Error(
-                        application.getString(R.string.user_error_download, userProfile.login, e.message.toString()),
-                        e
-                    )
-                )
+            switchActiveUserProfileUseCase(userProfile).collect { result ->
+                _user.emit(result)
+                getAllUsers()
             }
         }
     }
 
-    fun getRepository(userProfile: UserProfile, page: Int? = null) {
+    /**
+     * Загружает данные для пользователя, который СЕЙЧАС активен в TokenManager.
+     */
+    fun loadCurrentActiveUser() {
         viewModelScope.launch {
-            _repos.emit(UiState.Loading)
-            try {
-                val token = tokenManager.getDecryptedToken(userProfile.accessToken)
-                val response = if (token.isNullOrEmpty()) {
-                    gitHubRepository.getReposWithoutToken(userProfile.login, page)
-                } else {
-                    gitHubRepository.getRepos(page)
-                }
-                _repos.emit(UiState.Success(response))
-            } catch (e: DomainException) {
-                val errorMessage = parseDomainException(e)
-                _repos.emit(UiState.Error(errorMessage, e))
-            } catch (e: Exception) {
-                _repos.emit(
-                    UiState.Error(
-                        application.getString(R.string.repos_error_loading_user, userProfile.login, e.message.toString()),
-                        e
-                    )
-                )
+            getActiveUserUseCase().collect { result ->
+                _user.emit(result)
+                getAllUsers()
             }
         }
     }
 
-    fun deleteUser(profile: UserProfile) {
+    /**
+     * Загружает репозитории для ТЕКУЩЕГО АКТИВНОГО пользователя.
+     */
+    fun loadReposForCurrentUser(currentUserLogin: String, page: Int? = null) {
         viewModelScope.launch {
-            try {
-                val currentProfiles = profileRepository.getAllProfiles()
-                val indexOfDeleted = currentProfiles.indexOfFirst { it.id == profile.id }
-                profileRepository.deleteProfile(profile)
-                val updatedProfiles = profileRepository.getAllProfiles()
+            loadReposForCurrentUserUseCase(currentUserLogin, page).collect { result ->
+                _repos.emit(result)
+            }
+        }
+    }
 
-                if (updatedProfiles.isNotEmpty()) {
-                    var nextActiveProfile: UserProfile? = if (indexOfDeleted != -1) {
-                        if (indexOfDeleted < updatedProfiles.size) {
-                            updatedProfiles[indexOfDeleted]
-                        } else {
-                            updatedProfiles.last()
-                        }
-                    } else {
-                        updatedProfiles.first()
-                    }
+    /**
+     * Удаляем юзера
+     */
+    fun deleteUser(profileToDelete: UserProfile) {
+        viewModelScope.launch {
+            val result = deleteUserUseCase(profileToDelete)
+            _users.emit(result)
 
-                    if (nextActiveProfile != null) {
-                        profileRepository.setActiveProfile(nextActiveProfile)
-                        val finalList = profileRepository.getAllProfiles()
-                        _users.emit(UiState.Success(finalList))
-                    } else {
-                        _users.emit(UiState.Success(emptyList()))
-                    }
-                } else {
-                    _users.emit(UiState.Success(emptyList()))
-                }
-            } catch (e: DomainException) {
-                val errorMessage = parseDomainException(e)
-                _users.emit(UiState.Error(errorMessage, e))
-            } catch (e: Exception) {
-                _users.emit(
-                    UiState.Error(
-                        application.getString(
-                            R.string.user_error_removed,
-                            profile.login
-                        ), e
-                    )
-                )
+            if (result is UiState.Success && result.data.isNotEmpty()) {
+                loadCurrentActiveUser()
+            }
+            if (result is UiState.Success && result.data.isEmpty()) {
+                _user.emit(UiState.Error(application.getString(R.string.users_no_active), null))
             }
         }
     }
